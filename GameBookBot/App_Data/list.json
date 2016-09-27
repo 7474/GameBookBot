@@ -1,0 +1,12 @@
+﻿{
+  "games": [
+    {
+      "title": "HelloGame",
+      "path": "~/App_Data/hello.json"
+    },
+    {
+      "title": "FooFantasy",
+      "path": "~/App_Data/fantasy.json"
+    }
+  ]
+}

@@ -11,23 +11,20 @@ namespace GameBookBot
 {
     public class GameRepository
     {
-        //public GameRepository()
-        //{
-
-        //}
-
-        public async Task<Game> GetGame(string name)
+        public async Task<Game> GetGame(string title)
         {
-            return (await GetGames()).FirstOrDefault(x => x.Title == name);
-        }
-        public async Task<IEnumerable<Game>> GetGames()
-        {
-
-            var game = JsonConvert.DeserializeObject<Game>(await ReadFile(HttpContext.Current.Server.MapPath("~/App_Data/hello.json")));
-            return new List<Game>()
+            var gameSummary = (await GetGameList()).GetGameSummary(title);
+            if (gameSummary != null)
             {
-                game
-            };
+                return JsonConvert.DeserializeObject<Game>(await ReadFile(HttpContext.Current.Server.MapPath(gameSummary.Path)));
+            }
+            return null;
+        }
+
+        public async Task<GameList> GetGameList()
+        {
+            var gameList = JsonConvert.DeserializeObject<GameList>(await ReadFile(HttpContext.Current.Server.MapPath("~/App_Data/list.json")));
+            return gameList;
         }
 
         public static async Task<string> ReadFile(string filePath)
@@ -37,6 +34,23 @@ namespace GameBookBot
                 return await reader.ReadToEndAsync();
             }
         }
+    }
+
+    public class GameList
+    {
+        public IList<GameSummary> Games { get; set; }
+
+        public GameSummary GetGameSummary(string title)
+        {
+            return Games.FirstOrDefault(x => x.Title.StartsWith(title));
+        }
+    }
+
+    [Serializable]
+    public class GameSummary
+    {
+        public string Title { get; set; }
+        public string Path { get; set; }
     }
 
     public class Game
@@ -93,6 +107,7 @@ namespace GameBookBot
     [Serializable]
     public class GameContext
     {
+        public GameSummary GameSummary { get; set; }
         public string CurrentParagraphId { get; set; }
         public IDictionary<string, string> Data { get; set; }
         public bool IsMessagePerseFailed { get; set; }
