@@ -86,6 +86,19 @@ namespace GameBookBot.Dialogs
             }
             else
             {
+                if (paragraph.HasImage)
+                {
+                    var imageByBing = await new BingImagesConnector().SearchImage(paragraph.Image.Depiction);
+                    var imageMessage = context.MakeMessage();
+                    imageMessage.Attachments = new List<Attachment>();
+                    imageMessage.Attachments.Add(new Attachment()
+                    {
+                        ContentUrl = imageByBing,
+                        ContentType = "image/*",
+                        Name = paragraph.Image.Depiction
+                    });
+                    await context.PostAsync(imageMessage);
+                }
                 // XXX 選択NGだった場合のハンドリング
                 PromptDialog.Choice(context, SelectedOptionAsync, paragraph.GetChoosableOptions(gameContext), paragraph.GetMessage(gameContext));
             }
