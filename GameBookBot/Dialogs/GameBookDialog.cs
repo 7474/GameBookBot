@@ -88,12 +88,13 @@ namespace GameBookBot.Dialogs
             {
                 if (paragraph.HasImage)
                 {
+                    var imageByBing = await new BingImagesConnector().SearchImage(paragraph.Image.Depiction);
                     var imageMessage = context.MakeMessage();
                     imageMessage.Attachments = new List<Attachment>();
                     imageMessage.Attachments.Add(new Attachment()
                     {
-                        ContentUrl = "https://upload.wikimedia.org/wikipedia/en/a/a6/Bender_Rodriguez.png",
-                        ContentType = "image/png",
+                        ContentUrl = imageByBing,
+                        ContentType = "image/*",
                         Name = paragraph.Image.Depiction
                     });
                     await context.PostAsync(imageMessage);
