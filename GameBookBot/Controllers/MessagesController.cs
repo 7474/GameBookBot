@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.FormFlow;
 using GameBookBot.Dialogs;
+using System.Diagnostics;
 
 namespace GameBookBot
 {
@@ -24,7 +25,16 @@ namespace GameBookBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new GameBookDialog());
+                try
+                {
+                    await Conversation.SendAsync(activity, () => new GameBookDialog());
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError(ex.ToString());
+                    await activity.GetStateClient().BotState.DeleteStateForUserAsync(
+                        activity.ChannelId, activity.From.Id);
+                }
             }
             else
             {
