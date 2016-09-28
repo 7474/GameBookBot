@@ -51,8 +51,14 @@ namespace GameBookBot
     {
         public string Title { get; set; }
         public string Path { get; set; }
+
+        public override string ToString()
+        {
+            return Title;
+        }
     }
 
+    [Serializable]
     public class Game
     {
         public string Title { get; set; }
@@ -118,6 +124,7 @@ namespace GameBookBot
         }
     }
 
+    [Serializable]
     public class Paragraph
     {
         public string Id { get; set; }
@@ -126,15 +133,7 @@ namespace GameBookBot
 
         public string GetMessage(GameContext context)
         {
-            if (IsGameOver(context))
-            {
-                return $"{GetFormatedText(context)}\n\nゲームオーバー！";
-            }
-            else
-            {
-                var optionsText = string.Join(Environment.NewLine, GetChoosableOptions(context).Select(x => $"- {x.Id}: {x.Text}"));
-                return $"{GetFormatedText(context)}\n\n{ optionsText }";
-            }
+            return $"{GetFormatedText(context)}";
         }
 
         public string GetNextParagraphId(GameContext context, string message)
@@ -148,7 +147,7 @@ namespace GameBookBot
             return !GetChoosableOptions(context).Any();
         }
 
-        private IList<Option> GetChoosableOptions(GameContext context)
+        public IList<Option> GetChoosableOptions(GameContext context)
         {
             // XXX 状況に応じての選択可否
             return Options;
@@ -161,10 +160,16 @@ namespace GameBookBot
         }
     }
 
+    [Serializable]
     public class Option
     {
         public string Id { get; set; }
         public string Text { get; set; }
+
+        public override string ToString()
+        {
+            return Text;
+        }
     }
 
 }

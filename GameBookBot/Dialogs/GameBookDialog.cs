@@ -19,21 +19,18 @@ namespace GameBookBot.Dialogs
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             var message = await argument;
-            var title = message.Text;
             var repo = new GameRepository();
 
             var gameList = await repo.GetGameList();
-            var gameSummary = gameList.GetGameSummary(title);
-            if (gameSummary != null)
-            {
-                context.Call(new GameBookPlayDialog(gameSummary), AfterPlayAsync);
-            }
-            else
-            {
-                var gameListText = string.Join(Environment.NewLine, gameList.Games.Select(x => $"- {x.Title}"));
-                await context.PostAsync($"どのゲームをプレイする？\n\n{ gameListText }");
-                context.Wait(MessageReceivedAsync);
-            }
+
+            // XXX 選択NGだった場合のハンドリング
+            PromptDialog.Choice(context, SelectedGameAsync, gameList.Games, "どのゲームをプレイする？");
+        }
+
+        public async Task SelectedGameAsync(IDialogContext context, IAwaitable<GameSummary> argument)
+        {
+            var gameSummary = await argument;
+            context.Call(new GameBookPlayDialog(gameSummary), AfterPlayAsync);
         }
 
         public async Task AfterPlayAsync(IDialogContext context, IAwaitable<object> argument)
@@ -62,21 +59,35 @@ namespace GameBookBot.Dialogs
             context.Wait(MessageReceivedAsync);
         }
 
-        public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
+        private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             var message = await argument;
             var command = message.Text;
 
+            await processCommand(context, command);
+        }
+
+        private async Task SelectedOptionAsync(IDialogContext context, IAwaitable<Option> argument)
+        {
+            var option = await argument;
+            var command = option.Id;
+            await processCommand(context, command);
+        }
+
+        private async Task processCommand(IDialogContext context, string command)
+        {
             var game = await new GameRepository().GetGame(gameContext.GameSummary.Title);
             var paragraph = game.NextParagraph(gameContext, command);
-            await context.PostAsync(paragraph.GetMessage(gameContext));
+
             if (paragraph.IsGameOver(gameContext))
             {
+                await context.PostAsync(paragraph.GetMessage(gameContext));
                 context.Done(new object());
             }
             else
             {
-                context.Wait(MessageReceivedAsync);
+                // XXX 選択NGだった場合のハンドリング
+                PromptDialog.Choice(context, SelectedOptionAsync, paragraph.GetChoosableOptions(gameContext), paragraph.GetMessage(gameContext));
             }
         }
     }
