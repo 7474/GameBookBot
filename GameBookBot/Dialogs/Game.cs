@@ -63,6 +63,11 @@ namespace GameBookBot
     {
         public string Title { get; set; }
         public IList<Paragraph> Paragraphs { get; set; }
+
+        public string Image { get; set; }
+        [JsonIgnore]
+        public bool HasImage { get { return Image != null; } }
+
         private IDictionary<string, Paragraph> _paragraphDic;
         [JsonIgnore]
         public IDictionary<string, Paragraph> ParagraphDic
@@ -131,6 +136,10 @@ namespace GameBookBot
         public string Text { get; set; }
         public IList<Option> Options { get; set; }
 
+        public Image Image { get; set; }
+        [JsonIgnore]
+        public bool HasImage { get { return Image != null; } }
+
         public string GetMessage(GameContext context)
         {
             return $"{GetFormatedText(context)}";
@@ -172,4 +181,9 @@ namespace GameBookBot
         }
     }
 
+    [Serializable]
+    public class Image
+    {
+        public string Depiction { get; set; }
+    }
 }

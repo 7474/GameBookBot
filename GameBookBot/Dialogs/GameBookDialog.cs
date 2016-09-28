@@ -86,6 +86,18 @@ namespace GameBookBot.Dialogs
             }
             else
             {
+                if (paragraph.HasImage)
+                {
+                    var imageMessage = context.MakeMessage();
+                    imageMessage.Attachments = new List<Attachment>();
+                    imageMessage.Attachments.Add(new Attachment()
+                    {
+                        ContentUrl = "https://upload.wikimedia.org/wikipedia/en/a/a6/Bender_Rodriguez.png",
+                        ContentType = "image/png",
+                        Name = paragraph.Image.Depiction
+                    });
+                    await context.PostAsync(imageMessage);
+                }
                 // XXX 選択NGだった場合のハンドリング
                 PromptDialog.Choice(context, SelectedOptionAsync, paragraph.GetChoosableOptions(gameContext), paragraph.GetMessage(gameContext));
             }
