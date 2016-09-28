@@ -1,0 +1,58 @@
+﻿{
+  "title": "TokyoDemo",
+  "paragraphs": [
+    {
+      "id": "1",
+      "text": "Microsoft Bot Framework & Cognitive Services Deep Dive ハッカソン へようこそ！",
+      "image": {
+        "depiction": "Microsoft Bot Framework"
+      },
+      "options": [
+        {
+          "id": "2",
+          "text": "▼"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "text": "あなたはどちらの言語派ですか？",
+      "options": [
+        {
+          "id": "4",
+          "text": "C#(.NET Framework)"
+        },
+        {
+          "id": "3",
+          "text": "JavaScript(Node.js)"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "text": "Node.js はちょっとよくわからないですね。さようなら。",
+      "image": {
+        "depiction": "Node.js"
+      },
+      "options": []
+    },
+    {
+      "id": "4",
+      "text": "安定のコンパイル、C#はいいですよねぇ。",
+      "image": {
+        "depiction": "C#"
+      },
+      "options": [
+        {
+          "id": "5",
+          "text": "▼"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "text": "いい感じのテキストをかけなかったのでこれで終わりです。力尽きました。To Be Continue...",
+      "options": []
+    }
+  ]
+}

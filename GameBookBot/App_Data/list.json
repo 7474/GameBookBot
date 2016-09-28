@@ -7,6 +7,10 @@
     {
       "title": "FooFantasy",
       "path": "~/App_Data/fantasy.json"
+    },
+    {
+      "title": "TokyoDemo",
+      "path": "~/App_Data/tokio-demo.json"
     }
   ]
 }
