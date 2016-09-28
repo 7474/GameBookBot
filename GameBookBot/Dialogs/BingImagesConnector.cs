@@ -29,9 +29,9 @@ namespace GameBookBot
             var uri = "https://api.cognitive.microsoft.com/bing/v5.0/images/search?" + queryString;
 
             string imageUrl = "";
-            var response = await client.GetStringAsync(uri);
             try
             {
+                var response = await client.GetStringAsync(uri);
                 dynamic result = JObject.Parse(response);
                 imageUrl = result.value[0].contentUrl;
             }
