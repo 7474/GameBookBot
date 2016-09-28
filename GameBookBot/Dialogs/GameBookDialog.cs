@@ -35,7 +35,7 @@ namespace GameBookBot.Dialogs
 
         public async Task AfterPlayAsync(IDialogContext context, IAwaitable<object> argument)
         {
-            await context.PostAsync("サンキューフォープレイング。");
+            await context.PostToNextMessageAsync("サンキューフォープレイング。");
             context.Wait(MessageReceivedAsync);
         }
     }
@@ -55,7 +55,7 @@ namespace GameBookBot.Dialogs
 
         public async Task StartAsync(IDialogContext context)
         {
-            await context.PostAsync(gameContext.GameSummary.Title + " を開始します。");
+            await context.PostToNextMessageAsync(gameContext.GameSummary.Title + " を開始します。");
             context.Wait(MessageReceivedAsync);
         }
 
@@ -90,18 +90,39 @@ namespace GameBookBot.Dialogs
                 {
                     var imageByBing = await new BingImagesConnector().SearchImage(paragraph.Image.Depiction);
                     var imageMessage = context.MakeMessage();
-                    imageMessage.Attachments = new List<Attachment>();
-                    imageMessage.Attachments.Add(new Attachment()
+                    if (string.IsNullOrEmpty(imageByBing))
                     {
-                        ContentUrl = imageByBing,
-                        ContentType = "image/*",
-                        Name = paragraph.Image.Depiction
-                    });
+                        imageMessage.Text = paragraph.Image.Depiction;
+                    }
+                    else
+                    {
+                        imageMessage.Attachments = new List<Attachment>();
+                        imageMessage.Attachments.Add(new Attachment()
+                        {
+                            ContentUrl = imageByBing,
+                            ContentType = "image/*",
+                            Name = paragraph.Image.Depiction
+                        });
+                    }
                     await context.PostAsync(imageMessage);
                 }
                 // XXX 選択NGだった場合のハンドリング
                 PromptDialog.Choice(context, SelectedOptionAsync, paragraph.GetChoosableOptions(gameContext), paragraph.GetMessage(gameContext));
             }
+        }
+    }
+
+    public static class BotUtilities
+    {
+        public static async Task PostToNextMessageAsync(this IDialogContext context, string replyMessage)
+        {
+            await context.PostAsync(context.MakeToNextMessage(replyMessage));
+        }
+        public static IMessageActivity MakeToNextMessage(this IDialogContext context, string replyMessage)
+        {
+            var reply = context.MakeMessage();
+            reply.AddHeroCard(replyMessage, new string[] { "▼" });
+            return reply;
         }
     }
 }
