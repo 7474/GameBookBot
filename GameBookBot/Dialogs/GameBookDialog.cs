@@ -79,6 +79,27 @@ namespace GameBookBot.Dialogs
             var game = await new GameRepository().GetGame(gameContext.GameSummary.Title);
             var paragraph = game.NextParagraph(gameContext, command);
 
+            if (paragraph.HasImage)
+            {
+                var imageByBing = await new BingImagesConnector().SearchImage(paragraph.Image.Depiction);
+                var imageMessage = context.MakeMessage();
+                if (string.IsNullOrEmpty(imageByBing))
+                {
+                    imageMessage.Text = paragraph.Image.Depiction;
+                }
+                else
+                {
+                    imageMessage.Attachments = new List<Attachment>();
+                    imageMessage.Attachments.Add(new Attachment()
+                    {
+                        ContentUrl = imageByBing,
+                        ContentType = "image/*",
+                        Name = paragraph.Image.Depiction
+                    });
+                }
+                await context.PostAsync(imageMessage);
+            }
+
             if (paragraph.IsGameOver(gameContext))
             {
                 await context.PostAsync(paragraph.GetMessage(gameContext));
@@ -86,26 +107,6 @@ namespace GameBookBot.Dialogs
             }
             else
             {
-                if (paragraph.HasImage)
-                {
-                    var imageByBing = await new BingImagesConnector().SearchImage(paragraph.Image.Depiction);
-                    var imageMessage = context.MakeMessage();
-                    if (string.IsNullOrEmpty(imageByBing))
-                    {
-                        imageMessage.Text = paragraph.Image.Depiction;
-                    }
-                    else
-                    {
-                        imageMessage.Attachments = new List<Attachment>();
-                        imageMessage.Attachments.Add(new Attachment()
-                        {
-                            ContentUrl = imageByBing,
-                            ContentType = "image/*",
-                            Name = paragraph.Image.Depiction
-                        });
-                    }
-                    await context.PostAsync(imageMessage);
-                }
                 // XXX 選択NGだった場合のハンドリング
                 PromptDialog.Choice(context, SelectedOptionAsync, paragraph.GetChoosableOptions(gameContext), paragraph.GetMessage(gameContext));
             }
